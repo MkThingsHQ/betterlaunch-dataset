@@ -1,0 +1,52 @@
+name: Sync BetterLaunch dataset
+
+on:
+  schedule:
+    # Monday/Thursday 09:37 Asia/Shanghai; weekly launch is Monday 00:00 UTC.
+    - cron: '37 1 * * 1,4'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: betterlaunch-dataset-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    if: github.repository == 'MkThingsHQ/betterlaunch-dataset' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+      - name: Test generator
+        run: npm test
+      - name: Fetch and render catalog
+        env:
+          BETTERLAUNCH_API_KEY: ${{ secrets.BETTERLAUNCH_API_KEY }}
+        run: npm run sync
+      - name: Commit changed public outputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add -- README.md data/dataset.json
+          if git diff --cached --quiet; then
+            echo "Dataset is unchanged."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'chore(dataset): sync BetterLaunch catalog [skip actions]'
+          gh auth setup-git
+          git push origin HEAD:main
