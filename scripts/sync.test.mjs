@@ -44,7 +44,7 @@ test('weekly sync replaces previous products and clears a valid empty week', asy
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-const product = (id, year = 2026, weekNumber = 42) => ({ id, slug: `product-${id}`, name: `Product ${id}`, tagline: 'Useful tool', description: '<p>Full description</p>', websiteUrl: 'https://example.com', logoUrl: null, thumbnailUrl: '/media/image.webp', publishedAt: '2026-10-13T00:00:00.000Z', year, weekNumber });
+const product = (id, year = 2026, weekNumber = 42) => ({ id, slug: `product-${id}`, name: `Product ${id}`, tier: 'free', tagline: 'Useful tool', description: '<p>Full description</p>', websiteUrl: 'https://example.com', logoUrl: null, thumbnailUrl: '/media/image.webp', publishedAt: '2026-10-13T00:00:00.000Z', year, weekNumber });
 const sponsor = (websiteUrl = 'https://example.com', startsAt = '2026-10-01') => ({ name: 'Sponsor', tagline: 'Sponsor description', websiteUrl, imageUrl: null, startsAt, endsAt: '2026-10-31' });
 const fixture = () => ({ schemaVersion: 1, source: SOURCE, products: [product(1), product(2), product(3)], sponsors: [] });
 const template = '# Products\n{{STATS}}\n{{SPONSORS}}\n{{PRODUCTS}}\n';
@@ -74,10 +74,24 @@ test('preserves Unicode product slugs in safe encoded detail links', () => {
   data.products[0].slug = '海棠诗社';
   assert.match(renderReadme(data, template), /https:\/\/betterlaunch.app\/p\/%E6%B5%B7/);
 });
+test('marks only boost and highlight product names as featured without changing snapshots', () => {
+  const data = fixture();
+  data.products[1].tier = 'boost';
+  data.products[2].tier = 'highlight';
+  const before = JSON.stringify(data);
+  const rendered = renderReadme(data, template, week);
+  assert.match(rendered, /\| \[Product 1\]\(https:\/\/betterlaunch\.app\/p\/product-1\)/);
+  assert.match(rendered, /\| ⭐ \[Product 2\]\(https:\/\/betterlaunch\.app\/p\/product-2\)/);
+  assert.match(rendered, /\| ⭐ \[Product 3\]\(https:\/\/betterlaunch\.app\/p\/product-3\)/);
+  assert.equal((rendered.match(/⭐/g) ?? []).length, 2);
+  assert.equal(JSON.stringify(data), before);
+});
 test('rejects unknown public fields, private fields, duplicate IDs, invalid weeks and URLs', () => {
   for (const mutate of [
     (d) => { d.email = 'private@example.test'; },
     (d) => { d.products[0].stripePaymentId = 'private'; },
+    (d) => { d.products[0].tier = 'sponsor'; },
+    (d) => { delete d.products[0].tier; },
     (d) => { d.products.push(d.products[0]); },
     (d) => { d.products[0].websiteUrl = 'javascript:alert(1)'; },
     (d) => { d.products[0].websiteUrl = 'https://secret@example.com'; },

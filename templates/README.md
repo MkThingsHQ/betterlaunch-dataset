@@ -18,7 +18,9 @@ week at a time. Each sync replaces the previous week's product list.
 Browse the product pages for full descriptions, screenshots, and discussions.
 The [JSON dataset](data/dataset.json) includes the public product snapshots and
 all sponsor placements that have started, including past campaigns. Products
-retain their original launch week and author-provided language. Withdrawn
+retain their original launch week and author-provided language. Each product's
+`tier` is `free`, `boost`, or `highlight`; ⭐ before a product name marks a
+featured Boost or Highlight listing. Product names in JSON remain unchanged. Withdrawn
 products, unpublished submissions, future sponsorships, and private account or
 payment information are excluded. Sponsors are listed once per website.
 
@@ -40,8 +42,8 @@ use `npm run render -- --year 2026 --week-number 42`. Both explicit values must
 be provided together and form a valid ISO week. After the initial reset, the
 catalog stays empty until a successful sync.
 
-The website must support the weekly query parameters before this workflow is
-run. The client rejects products from other weeks rather than publishing an
+The website must support the weekly query parameters and export each product's
+`tier` before this workflow is run. The client rejects products from other weeks rather than publishing an
 unfiltered response from an older server.
 
 ## Contributing

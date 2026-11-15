@@ -20,7 +20,7 @@ const media = (v) => v === null || url(v) || (nonempty(v) && v.startsWith('/') &
 const schemas = {
   products: {
     id: integer, slug: (v) => nonempty(v) && /^[\p{L}\p{N}\p{M}]+(?:-[\p{L}\p{N}\p{M}]+)*$/u.test(v),
-    name: nonempty, tagline: nullableText, description: nullableText,
+    name: nonempty, tier: (v) => ['free', 'boost', 'highlight'].includes(v), tagline: nullableText, description: nullableText,
     websiteUrl: url, logoUrl: media, thumbnailUrl: media, publishedAt: date,
     year: (v) => integer(v) && v >= 1970 && v <= 9999,
     weekNumber: (v) => integer(v) && v <= 53,
@@ -149,7 +149,7 @@ export function renderReadme(input, template, week) {
   }
   const toc = [...weeks].map(([week, rows]) => `- [${week.replace('-W', ' · Week ')}](#${week.toLowerCase()}) (${rows.length})`).join('\n');
   const sections = [...weeks].map(([week, rows]) => {
-    const productRows = rows.map((p) => `| ${link(p.name, `/p/${p.slug}`)} | ${cell(p.tagline) || '—'} | ${link('Website', p.websiteUrl)} |`).join('\n');
+    const productRows = rows.map((p) => `| ${p.tier === 'boost' || p.tier === 'highlight' ? '⭐ ' : ''}${link(p.name, `/p/${p.slug}`)} | ${cell(p.tagline) || '—'} | ${link('Website', p.websiteUrl)} |`).join('\n');
     return `### ${week}\n\n| Product | Description | Website |\n| --- | --- | --- |\n${productRows}`;
   }).join('\n\n');
   const weekLabel = week ? `${week.year}-W${String(week.weekNumber).padStart(2, '0')}` : null;
