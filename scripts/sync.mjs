@@ -1,5 +1,6 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { parseArgs } from 'node:util';
 import { resolve } from 'node:path';
 
 export const SOURCE = 'https://betterlaunch.app';
@@ -32,6 +33,32 @@ const schemas = {
 function assert(condition, message) { if (!condition) throw new Error(message); }
 function keys(value) { return Object.keys(value).sort().join(','); }
 
+export function validateWeek(year, weekNumber) {
+  assert(integer(year) && year >= 1970 && year <= 9999 && integer(weekNumber) && weekNumber <= 53, 'Invalid ISO year or week number.');
+  const jan4 = new Date(Date.UTC(year, 0, 4));
+  const thursday = new Date(Date.UTC(year, 0, 4 - ((jan4.getUTCDay() || 7) - 1) + (weekNumber - 1) * 7 + 3));
+  assert(thursday.getUTCFullYear() === year, 'Invalid ISO week.');
+  return { year, weekNumber };
+}
+
+export function currentWeek(now = new Date()) {
+  const localDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+  const thursday = new Date(`${localDate}T00:00:00Z`);
+  thursday.setUTCDate(thursday.getUTCDate() + 4 - (thursday.getUTCDay() || 7));
+  const year = thursday.getUTCFullYear();
+  const weekNumber = Math.ceil(((thursday - new Date(Date.UTC(year, 0, 1))) / 86400000 + 1) / 7);
+  return validateWeek(year, weekNumber);
+}
+
+export function requestedWeek(year, weekNumber, now = new Date()) {
+  const hasYear = year !== undefined && year !== '';
+  const hasWeek = weekNumber !== undefined && weekNumber !== '';
+  assert(hasYear === hasWeek, 'Provide both year and week number.');
+  if (!hasYear) return currentWeek(now);
+  assert(/^\d{4}$/.test(year) && /^\d{1,2}$/.test(weekNumber), 'Use a four-digit year and an integer week number.');
+  return validateWeek(Number(year), Number(weekNumber));
+}
+
 /** Fail closed on unknown fields before any response enters the public repo. */
 export function validateDataset(input) {
   assert(input && typeof input === 'object' && !Array.isArray(input), 'Invalid dataset.');
@@ -47,14 +74,10 @@ export function validateDataset(input) {
       if (collection === 'products') {
         assert(!ids.has(row.id) && !slugs.has(row.slug), 'Duplicate product identity.');
         ids.add(row.id); slugs.add(row.slug);
-        const jan4 = new Date(Date.UTC(row.year, 0, 4));
-        const monday = new Date(Date.UTC(row.year, 0, 4 - ((jan4.getUTCDay() || 7) - 1) + (row.weekNumber - 1) * 7));
-        monday.setUTCDate(monday.getUTCDate() + 3);
-        assert(monday.getUTCFullYear() === row.year, 'Invalid ISO week.');
+        validateWeek(row.year, row.weekNumber);
       } else assert(row.startsAt <= row.endsAt, 'Invalid sponsor date range.');
     }
   }
-  assert(input.products.length > 0, 'Refusing an empty product catalog.');
   return input;
 }
 
@@ -67,12 +90,16 @@ export function normalizeDataset(input) {
   };
 }
 
-export async function fetchDataset(key, fetcher = fetch, pause = (ms) => new Promise((r) => setTimeout(r, ms))) {
+export async function fetchDataset(key, fetcher = fetch, pause = (ms) => new Promise((r) => setTimeout(r, ms)), week = currentWeek()) {
   assert(nonempty(key), 'BETTERLAUNCH_API_KEY is required.');
+  validateWeek(week.year, week.weekNumber);
+  const endpoint = new URL(ENDPOINT);
+  endpoint.searchParams.set('year', String(week.year));
+  endpoint.searchParams.set('weekNumber', String(week.weekNumber));
   for (let attempt = 0; attempt < 3; attempt++) {
     let response;
     try {
-      response = await fetcher(ENDPOINT, { headers: { 'x-api-key': key, Accept: 'application/json' }, redirect: 'error', signal: AbortSignal.timeout(90_000) });
+      response = await fetcher(endpoint.href, { headers: { 'x-api-key': key, Accept: 'application/json' }, redirect: 'error', signal: AbortSignal.timeout(90_000) });
     } catch {
       if (attempt === 2) throw new Error('BetterLaunch request failed (network, redirect, or timeout).');
       await pause(2000 * (attempt + 1)); continue;
@@ -86,9 +113,11 @@ export async function fetchDataset(key, fetcher = fetch, pause = (ms) => new Pro
     assert((response.headers.get('content-type') ?? '').includes('application/json'), 'Expected JSON response.');
     const body = await response.text();
     assert(body.length <= 30_000_000, 'Dataset exceeds the size limit.');
-    let data;
-    try { data = JSON.parse(body); } catch { throw new Error('Invalid JSON response.'); }
-    return normalizeDataset(data);
+    let parsed;
+    try { parsed = JSON.parse(body); } catch { throw new Error('Invalid JSON response.'); }
+    const data = normalizeDataset(parsed);
+    assert(data.products.every((p) => p.year === week.year && p.weekNumber === week.weekNumber), 'API returned products outside the requested week.');
+    return data;
   }
 }
 
@@ -107,7 +136,7 @@ export function uniqueSponsors(placements) {
     seen.add(identity); return true;
   });
 }
-export function renderReadme(input, template) {
+export function renderReadme(input, template, week) {
   const data = normalizeDataset(input);
   const sponsors = uniqueSponsors(data.sponsors);
   const sponsorRows = sponsors.map((s) => `| ${link(s.name, s.websiteUrl)} | ${cell(s.tagline) || '—'} |`).join('\n');
@@ -123,14 +152,20 @@ export function renderReadme(input, template) {
     const productRows = rows.map((p) => `| ${link(p.name, `/p/${p.slug}`)} | ${cell(p.tagline) || '—'} | ${link('Website', p.websiteUrl)} |`).join('\n');
     return `### ${week}\n\n| Product | Description | Website |\n| --- | --- | --- |\n${productRows}`;
   }).join('\n\n');
+  const weekLabel = week ? `${week.year}-W${String(week.weekNumber).padStart(2, '0')}` : null;
+  const productsBlock = weekLabel
+    ? `## Products for ${weekLabel}\n\n${sections || 'No products have launched for this week yet.'}`
+    : `## Products by launch week\n\n${toc}\n\n${sections || 'No products have been synced yet.'}`;
   return template.replace('{{STATS}}', `**${data.products.length} products · ${weeks.size} launch weeks · ${sponsors.length} sponsors**`)
-    .replace('{{SPONSORS}}', sponsorsBlock).replace('{{PRODUCTS}}', `## Products by launch week\n\n${toc}\n\n${sections}`);
+    .replace('{{SPONSORS}}', sponsorsBlock).replace('{{PRODUCTS}}', productsBlock);
 }
 
-export async function sync({ root = ROOT, key = process.env.BETTERLAUNCH_API_KEY, fromFile, fetcher = fetch } = {}) {
-  const data = fromFile ? normalizeDataset(JSON.parse(await readFile(resolve(fromFile), 'utf8'))) : await fetchDataset(key, fetcher);
+export async function sync({ root = ROOT, key = process.env.BETTERLAUNCH_API_KEY, fromFile, fetcher = fetch, week = currentWeek() } = {}) {
+  validateWeek(week.year, week.weekNumber);
+  const data = fromFile ? normalizeDataset(JSON.parse(await readFile(resolve(fromFile), 'utf8'))) : await fetchDataset(key, fetcher, undefined, week);
+  assert(data.products.every((p) => p.year === week.year && p.weekNumber === week.weekNumber), 'Dataset contains products outside the requested week.');
   const template = await readFile(resolve(root, 'templates/README.md'), 'utf8');
-  const readme = renderReadme(data, template);
+  const readme = renderReadme(data, template, week);
   assert(!/\{\{(?:STATS|SPONSORS|PRODUCTS)\}\}/.test(readme), 'Unresolved template marker.');
   await mkdir(resolve(root, 'data'), { recursive: true });
   const outputs = [['README.md', readme], ['data/dataset.json', `${JSON.stringify(data, null, 2)}\n`]];
@@ -140,11 +175,9 @@ export async function sync({ root = ROOT, key = process.env.BETTERLAUNCH_API_KEY
   console.log(`Rendered ${data.products.length} products and ${uniqueSponsors(data.sponsors).length} sponsors.`);
 }
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
-  const args = process.argv.slice(2);
-  if (args.length && (args.length !== 2 || args[0] !== '--from-file')) {
-    console.error('Usage: node scripts/sync.mjs [--from-file data/dataset.json]'); process.exitCode = 1;
-  } else {
-    try { await sync({ fromFile: args[1] }); }
-    catch (error) { console.error(error instanceof Error ? error.message : 'Dataset sync failed.'); process.exitCode = 1; }
-  }
+  try {
+    const { values } = parseArgs({ options: { 'from-file': { type: 'string' }, year: { type: 'string' }, 'week-number': { type: 'string' } } });
+    const week = requestedWeek(values.year ?? process.env.DATASET_YEAR, values['week-number'] ?? process.env.DATASET_WEEK_NUMBER);
+    await sync({ fromFile: values['from-file'], week });
+  } catch (error) { console.error(error instanceof Error ? error.message : 'Dataset sync failed.'); process.exitCode = 1; }
 }

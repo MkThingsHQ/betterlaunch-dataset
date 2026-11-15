@@ -5,6 +5,15 @@ on:
     # Monday 10:00 Asia/Shanghai (UTC+8).
     - cron: '0 2 * * 1'
   workflow_dispatch:
+    inputs:
+      year:
+        description: 'ISO week year (leave both fields empty for the current Shanghai week)'
+        required: false
+        type: string
+      weekNumber:
+        description: 'ISO week number (1–53; requires year)'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -35,6 +44,8 @@ jobs:
       - name: Fetch and render catalog
         env:
           BETTERLAUNCH_API_KEY: ${{ secrets.BETTERLAUNCH_API_KEY }}
+          DATASET_YEAR: ${{ inputs.year }}
+          DATASET_WEEK_NUMBER: ${{ inputs.weekNumber }}
         run: npm run sync
       - name: Commit changed public outputs
         env:

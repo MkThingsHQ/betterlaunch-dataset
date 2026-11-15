@@ -3,15 +3,56 @@ import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { SOURCE, ENDPOINT, validateDataset, normalizeDataset, renderReadme, fetchDataset, sync } from './sync.mjs';
+import { SOURCE, ENDPOINT, validateDataset, normalizeDataset, renderReadme, fetchDataset as fetchWeeklyDataset, sync as syncWeek, currentWeek, requestedWeek } from './sync.mjs';
+const week = { year: 2026, weekNumber: 42 };
+const fetchDataset = (key, fetcher, pause) => fetchWeeklyDataset(key, fetcher, pause, week);
+const sync = (options) => syncWeek({ ...options, week });
+test('uses Shanghai Monday and ISO week-year boundaries', () => {
+  assert.deepEqual(currentWeek(new Date('2026-11-15T15:59:59Z')), { year: 2026, weekNumber: 46 });
+  assert.deepEqual(currentWeek(new Date('2026-11-15T16:00:00Z')), { year: 2026, weekNumber: 47 });
+  assert.deepEqual(currentWeek(new Date('2021-01-01T00:00:00Z')), { year: 2020, weekNumber: 53 });
+  assert.deepEqual(currentWeek(new Date('2025-12-29T02:00:00Z')), { year: 2026, weekNumber: 1 });
+});
+test('requires a valid explicit ISO year/week pair', () => {
+  assert.deepEqual(requestedWeek('2020', '53'), { year: 2020, weekNumber: 53 });
+  for (const args of [['2025', '53'], ['2026', '0'], ['2026', '54'], ['2026', undefined], [undefined, '42'], ['2026', '4.2'], ['2026x', '42']]) {
+    assert.throws(() => requestedWeek(...args));
+  }
+});
+test('rejects a server that ignores the weekly filter, and accepts a valid empty week', async () => {
+  const mixed = fixture();
+  mixed.products.push(product(9, 2025, 52));
+  await assert.rejects(fetchDataset('test-key', async () => response(mixed)), /outside the requested week/);
+  const empty = { ...fixture(), products: [] };
+  assert.deepEqual((await fetchDataset('test-key', async () => response(empty))).products, []);
+  const rendered = renderReadme(empty, template, week);
+  assert.match(rendered, /Products for 2026-W42/);
+  assert.match(rendered, /No products have launched for this week yet/);
+});
+test('weekly sync replaces previous products and clears a valid empty week', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'betterlaunch-week-'));
+  try {
+    await mkdir(join(root, 'templates'));
+    await writeFile(join(root, 'templates/README.md'), template);
+    await sync({ root, key: 'test-key', fetcher: async () => response(fixture()) });
+    const mixed = fixture(); mixed.products.push(product(9, 2025, 52));
+    await assert.rejects(sync({ root, key: 'test-key', fetcher: async () => response(mixed) }), /outside the requested week/);
+    assert.equal(JSON.parse(await readFile(join(root, 'data/dataset.json'), 'utf8')).products.length, 3);
+    await sync({ root, key: 'test-key', fetcher: async () => response({ ...fixture(), products: [] }) });
+    assert.deepEqual(JSON.parse(await readFile(join(root, 'data/dataset.json'), 'utf8')).products, []);
+    assert.doesNotMatch(await readFile(join(root, 'README.md'), 'utf8'), /product-1/);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
 const product = (id, year = 2026, weekNumber = 42) => ({ id, slug: `product-${id}`, name: `Product ${id}`, tagline: 'Useful tool', description: '<p>Full description</p>', websiteUrl: 'https://example.com', logoUrl: null, thumbnailUrl: '/media/image.webp', publishedAt: '2026-10-13T00:00:00.000Z', year, weekNumber });
 const sponsor = (websiteUrl = 'https://example.com', startsAt = '2026-10-01') => ({ name: 'Sponsor', tagline: 'Sponsor description', websiteUrl, imageUrl: null, startsAt, endsAt: '2026-10-31' });
-const fixture = () => ({ schemaVersion: 1, source: SOURCE, products: [product(1), product(2, 2025, 52), product(3)], sponsors: [] });
+const fixture = () => ({ schemaVersion: 1, source: SOURCE, products: [product(1), product(2), product(3)], sponsors: [] });
 const template = '# Products\n{{STATS}}\n{{SPONSORS}}\n{{PRODUCTS}}\n';
 const response = (data) => new Response(JSON.stringify(data), { headers: { 'content-type': 'application/json' } });
 
 test('orders permanent Batch weeks newest first, including year boundaries', () => {
   const data = fixture();
+  data.products[1] = product(2, 2025, 52);
   data.products.push(product(4, 2026, 1));
   const rendered = renderReadme(data, template);
   assert.deepEqual(normalizeDataset(data).products.map((p) => p.id), [3, 1, 4, 2]);
@@ -41,7 +82,7 @@ test('rejects unknown public fields, private fields, duplicate IDs, invalid week
     (d) => { d.products[0].websiteUrl = 'javascript:alert(1)'; },
     (d) => { d.products[0].websiteUrl = 'https://secret@example.com'; },
     (d) => { d.products[0].year = 2025; d.products[0].weekNumber = 53; },
-    (d) => { d.products = []; },
+    (d) => { d.products = null; },
     (d) => { d.sponsors = [sponsor()]; d.sponsors[0].startsAt = '2026-02-30'; },
   ]) { const data = fixture(); mutate(data); assert.throws(() => validateDataset(data)); }
 });
@@ -56,7 +97,7 @@ test('escapes author Markdown and HTML in table cells', () => {
 });
 test('requests fixed HTTPS source with header secret and disables redirects', async () => {
   await fetchDataset('test-only-secret', async (url, options) => {
-    assert.equal(url, ENDPOINT); assert.equal(options.redirect, 'error');
+    assert.equal(url, `${ENDPOINT}?year=2026&weekNumber=42`); assert.equal(options.redirect, 'error');
     assert.equal(options.headers['x-api-key'], 'test-only-secret');
     return response(fixture());
   });
@@ -88,7 +129,7 @@ test('failed validation preserves both outputs; unchanged sync is byte-identical
     await writeFile(join(root, 'templates/README.md'), template);
     await writeFile(join(root, 'README.md'), 'previous readme');
     await writeFile(join(root, 'data/dataset.json'), 'previous data');
-    await assert.rejects(sync({ root, key: 'test-key', fetcher: async () => response({ ...fixture(), products: [] }) }));
+    await assert.rejects(sync({ root, key: 'test-key', fetcher: async () => response({ ...fixture(), schemaVersion: 2 }) }));
     assert.equal(await readFile(join(root, 'README.md'), 'utf8'), 'previous readme');
     assert.equal(await readFile(join(root, 'data/dataset.json'), 'utf8'), 'previous data');
     await sync({ root, key: 'test-key', fetcher: async () => response(fixture()) });
