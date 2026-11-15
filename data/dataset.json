@@ -3,6 +3,162 @@
   "source": "https://betterlaunch.app",
   "products": [
     {
+      "id": 25,
+      "slug": "ai-free-video",
+      "name": "AI Free video",
+      "tagline": "Free AI Video Generator: Turn Text or Photos Into Video",
+      "description": "<p>AIFree.video is an online AI video generator that turns text prompts and photos into short, downloadable videos.</p><p><strong>Start creating for free:</strong> Generate approximately 5-second, 480p videos using Wan 2.2 5B Fast without signing up or providing payment information. Free text-to-video generation uses a shared queue and is subject to daily availability.</p><p><strong>More creative possibilities:</strong> Animate photos, generate videos with sound, or access advanced AI models including Seedance 1.0 Pro Fast, Seedance 2.0 Mini, and MiniMax H3 Max Turbo using credits.</p><p>Choose different video lengths and resolutions, explore ready-to-use prompts, and preview example videos with their generation settings.</p><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"http://AIFree.video\">AIFree.video</a> is designed for content creators, marketers, and anyone experimenting with AI-generated videos for social media, product demonstrations, creative projects, and visual storytelling.</p><p>Start free and upgrade only when you need additional features.</p>",
+      "websiteUrl": "https://aifree.video",
+      "logoUrl": "/media/logos/V7KmHfSsvj5HJ4OCgDEdZScNXnPIGBrl/882d1daf-8b42-4526-80f2-ce69b2c10ef8.png",
+      "thumbnailUrl": "/media/thumbnails/V7KmHfSsvj5HJ4OCgDEdZScNXnPIGBrl/b78893b7-1236-48b0-9f71-e0bdbc489a44.png",
+      "publishedAt": "2026-11-15T11:00:21.302Z",
+      "year": 2026,
+      "weekNumber": 46
+    },
+    {
+      "id": 24,
+      "slug": "skillry",
+      "name": "Skillry",
+      "tagline": "Agent Skills with taste",
+      "description": "<p>Skillry creates reusable Agent Skills for making well-designed websites, slide decks, images, and videos with AI coding agents such as Claude Code, Codex, and Cursor. Each Skill combines original instructions, templates, and scripts, with real output previews so you can see what it makes before installing. Browse free and paid Skills, connect your agent through the official CLI, and bring a repeatable creative workflow into your own projects.</p>",
+      "websiteUrl": "https://skillry.dev",
+      "logoUrl": "/media/logos/xFNUqEhbsw684MtFxNK1IG0vxjFYSOKk/24247e24-7788-45f6-a257-f64cc2339c38.png",
+      "thumbnailUrl": "/media/thumbnails/xFNUqEhbsw684MtFxNK1IG0vxjFYSOKk/9424f310-e496-43a0-9b96-70e3666d12fa.png",
+      "publishedAt": "2026-11-15T08:40:04.737Z",
+      "year": 2026,
+      "weekNumber": 46
+    },
+    {
+      "id": 23,
+      "slug": "bizpeel",
+      "name": "BizPeel",
+      "tagline": "See how real startups grow and make money",
+      "description": "<p>BizPeel helps founders, marketers, and researchers understand how real online businesses make money and grow. Explore revenue data, traffic and search insights, marketing tactics, distribution channels, and growth loops in source-linked business reports. Compare companies, validate ideas, and find practical acquisition strategies. Connect BizPeel to AI agents through MCP to research businesses in your workflow.</p>",
+      "websiteUrl": "https://bizpeel.com",
+      "logoUrl": "/media/logos/xFNUqEhbsw684MtFxNK1IG0vxjFYSOKk/1612817d-749e-4672-845b-f44ab914372c.png",
+      "thumbnailUrl": "/media/thumbnails/xFNUqEhbsw684MtFxNK1IG0vxjFYSOKk/00a7b9e1-f3d0-4f88-8780-b6497afc5501.png",
+      "publishedAt": "2026-11-15T08:39:59.925Z",
+      "year": 2026,
+      "weekNumber": 46
+    },
+    {
+      "id": 22,
+      "slug": "blob0",
+      "name": "Blob0",
+      "tagline": "Manage S3 storage on your Mac like local files",
+      "description": "<p>Blob0 is a macOS app for managing S3-compatible storage with a local file browser interface. It supports browsing, transferring, organizing, previewing, and sharing objects across providers such as Cloudflare R2, Amazon S3, and MinIO. It is aimed at Mac users who want to work with cloud object storage without leaving the desktop file-management workflow. Credentials are stored in the macOS Keychain.</p>",
+      "websiteUrl": "https://blob0.com",
+      "logoUrl": "/media/logos/5g8MgHM6DAWmJEddoHlNAfhmvP8aAcUB/bf02f710-9a9f-45cf-aff8-e092cba96aca.png",
+      "thumbnailUrl": "/media/thumbnails/5g8MgHM6DAWmJEddoHlNAfhmvP8aAcUB/03f1d488-1116-474a-a81c-2bcebf6b8c72.png",
+      "publishedAt": "2026-11-15T07:00:32.662Z",
+      "year": 2026,
+      "weekNumber": 46
+    },
+    {
+      "id": 21,
+      "slug": "mkext",
+      "name": "MkExt",
+      "tagline": "Open-source browser extension starter for SaaS applications.",
+      "description": "<p>MkExt is an open-source, Apache 2.0 browser extension starter built on the WXT framework for SaaS applications. It provides a React codebase with ready-made surfaces—popup, side panel, options, new tab, DevTools, background, and extension-owned pages—alongside typed shared state, localization, themes, and an authentication-ready sign-in flow that stores sessions in extension storage. Developers can connect it to their existing SaaS backend and build Chrome MV3 and Firefox packages from one codebase.</p><p>It is intended for SaaS teams that want a working extension foundation instead of starting from a blank manifest, and for developers who need to package and ship extensions locally or in CI.</p>",
+      "websiteUrl": "https://mkext.dev",
+      "logoUrl": "/media/logos/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/9936c899-c573-47ad-9fa4-53e6553fc989.png",
+      "thumbnailUrl": "/media/thumbnails/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/b60a04ad-33ff-4d07-a1f1-b9289a3c28fd.png",
+      "publishedAt": "2026-11-15T02:54:00.995Z",
+      "year": 2026,
+      "weekNumber": 46
+    },
+    {
+      "id": 20,
+      "slug": "mkagent",
+      "name": "MkAgent",
+      "tagline": "A local-first, Pi-powered AI agent workspace for Desktop, WebUI, and CLI.",
+      "description": "<p>MkAgent is an open-source, local-first AI agent workspace that runs durable sessions from a desktop app, WebUI, or CLI. Each session is scoped to a real working directory under ~/.mkagent, with shared session history, Skills, permissions, and local files across all three surfaces.</p><p>It is aimed at users who want more control over their AI work. Model connections run through the Pi backend, supporting subscriptions (ChatGPT Plus, Claude Pro/Max), provider API keys, compatible endpoints, and local Ollama models.</p><ul><li><p>Follow thinking, tool calls, diffs, plans, and document output in one inspectable session</p></li><li><p>Resume the same local session from Desktop, WebUI, or CLI</p></li><li><p>Apache-2.0 Bun monorepo foundation with Electron packaging; English and Simplified Chinese UI</p></li></ul>",
+      "websiteUrl": "https://mkagent.app",
+      "logoUrl": "/media/logos/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/6d2d53ee-281c-4a0f-b3b4-9f5f48cf41a5.png",
+      "thumbnailUrl": "/media/thumbnails/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/42ba614c-9f7d-4253-89ad-a8453297b84d.png",
+      "publishedAt": "2026-11-15T02:53:19.672Z",
+      "year": 2026,
+      "weekNumber": 46
+    },
+    {
+      "id": 19,
+      "slug": "海棠诗社",
+      "name": "海棠诗社",
+      "tagline": "古诗词的数字桃源",
+      "description": "<p>海棠诗社是一个面向古诗词爱好者与学习者的数字平台，收录唐诗、宋词、诗经、楚辞等作品，并按作者、朝代组织内容。网站以精选诗句展示王维、温庭筠、纳兰性德、陆游等诗人词人的作品。</p><p>平台设有唐诗三百、宋词三百、古诗十九、诗经全集、楚辞全集、乐府诗集、古文观止、人间词话等选集，也提供小学、初中、高中古诗分类，以及思乡、离别、边塞、田园、四季等主题分类，便于按学段或题材查找诗词。</p>",
+      "websiteUrl": "https://haitang.app",
+      "logoUrl": "/media/logos/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/78220a02-7ec5-4fb6-a9fd-79b9099e33cf.png",
+      "thumbnailUrl": "/media/thumbnails/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/b7acb33b-c911-4210-addd-ce21b08902ea.png",
+      "publishedAt": "2026-11-15T02:52:44.245Z",
+      "year": 2026,
+      "weekNumber": 46
+    },
+    {
+      "id": 18,
+      "slug": "indiehub",
+      "name": "IndieHub",
+      "tagline": "The Best All-in-One Directory for Indie Makers",
+      "description": "<p>IndieHub is an all-in-one directory for indie makers. It is designed to help independent creators and developers discover tools, launch products, and ship applications faster and better.</p><ul><li><p>Discover tools for indie development</p></li><li><p>Launch products to a maker audience</p></li><li><p>Ship applications more efficiently</p></li></ul>",
+      "websiteUrl": "https://indiehub.best",
+      "logoUrl": "/media/logos/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/05edd71a-da57-4be3-8c24-969978c322e0.png",
+      "thumbnailUrl": "/media/thumbnails/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/0b506777-8037-4a95-9ff2-a3a1b58c523d.png",
+      "publishedAt": "2026-11-15T02:52:15.713Z",
+      "year": 2026,
+      "weekNumber": 46
+    },
+    {
+      "id": 17,
+      "slug": "mkdirs",
+      "name": "Mkdirs",
+      "tagline": "The Best Directory Boilerplate with AI",
+      "description": "<p>Mkdirs is an open-source directory boilerplate built on Next.js, designed to help developers launch an AI-powered directory website quickly. It bundles listings, payments, submissions, a CMS, blog, authentication, newsletter, SEO, and themes into a single starting template.</p><ul><li><p>Built on Next.js with Auth.js, Shadcn UI, Tailwind CSS, Sanity CMS, Resend, Stripe, and the Vercel AI SDK.</p></li><li><p>Supports monetization through affiliate links, paid submissions, and sponsored ads.</p></li><li><p>Content is managed through the built-in Sanity Studio after cloning and deploying the repository.</p></li></ul>",
+      "websiteUrl": "https://mkdirs.com",
+      "logoUrl": "/media/logos/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/8120ca6b-1003-4806-be69-ed9fc8417474.png",
+      "thumbnailUrl": "/media/thumbnails/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/06e9f188-2e7a-46a6-b9ab-766bc1bce2c7.png",
+      "publishedAt": "2026-11-15T02:51:23.923Z",
+      "year": 2026,
+      "weekNumber": 46
+    },
+    {
+      "id": 16,
+      "slug": "mkimage",
+      "name": "MkImage",
+      "tagline": "AI Image Prompt Gallery",
+      "description": "<p>MkImage is an AI image prompt gallery that collects image prompts from named creators, each shown with a preview image and attributed to its author. Prompts can be sorted by newest, popular, or random, and filtered by model, including Nano Banana and GPT Image.</p><p>Users can browse the gallery and select \"Use this Prompt\" on any entry. It is intended for people working with AI image generation who want ready-made prompts and examples of the results they produce.</p>",
+      "websiteUrl": "https://mkimage.ai",
+      "logoUrl": "/media/logos/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/c0ec696b-f93d-441d-a0a6-9b836bd39173.png",
+      "thumbnailUrl": "/media/thumbnails/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/c9840c34-7fb2-4aa4-a29c-02dda824e13d.jpg",
+      "publishedAt": "2026-11-14T23:33:28.431Z",
+      "year": 2026,
+      "weekNumber": 46
+    },
+    {
+      "id": 15,
+      "slug": "mksaas",
+      "name": "MkSaaS",
+      "tagline": "Make Your AI SaaS Product in a Weekend",
+      "description": "<p>MkSaaS is a Next.js boilerplate for building AI SaaS products, packaging the common infrastructure needed to launch. It includes authentication, payments via Stripe, Creem or Waf, billing and customer portal, internationalization, newsletter and email, dashboard, admin user management, API keys, blog, docs, SEO, UI blocks and themes, plus Vercel, Docker and Cloudflare deployment.</p><p>It is aimed at developers and indie founders who want to ship a SaaS without wiring vendors from scratch. The codebase is structured for AI coding assistants such as Claude Code, Codex, Gemini, Cursor, Copilot and Windsurf, with TypeScript and consistent naming intended to help those tools generate accurate features.</p>",
+      "websiteUrl": "https://mksaas.com",
+      "logoUrl": "/media/logos/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/a0663ca4-1048-420d-a57c-7a022b2b5576.png",
+      "thumbnailUrl": "/media/thumbnails/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/264ccc33-e153-49d3-9529-22e51148e8e5.png",
+      "publishedAt": "2026-11-14T23:32:52.652Z",
+      "year": 2026,
+      "weekNumber": 46
+    },
+    {
+      "id": 14,
+      "slug": "tanstarter",
+      "name": "TanStarter",
+      "tagline": "Ship Faster with TanStack, Cost Less with Cloudflare",
+      "description": "<p>TanStarter is a TanStack Start boilerplate for building SaaS applications, deployed on Cloudflare Workers. It includes AI, authentication, payments, database, storage, email, newsletter, blog, dashboard, and SEO features.</p><p>It is aimed at developers and teams building SaaS products. The codebase is structured for AI coding assistants such as Claude Code, Codex, Gemini, Cursor, Copilot, and Windsurf, with TypeScript and built-in best practices. A CLI clones the template, provisions Cloudflare D1, R2, and KV resources, writes environment files, runs migrations, deploys the Worker, and pushes the project to GitHub.</p>",
+      "websiteUrl": "https://tanstarter.dev",
+      "logoUrl": "/media/logos/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/acbf4e16-94c9-493d-a35e-44ea298837c2.png",
+      "thumbnailUrl": "/media/thumbnails/nSys9PgMZvDf3yBngm5qXyMojurpnmzt/f448aaa2-f1fa-4769-b909-db87cda11635.png",
+      "publishedAt": "2026-11-14T23:29:24.193Z",
+      "year": 2026,
+      "weekNumber": 46
+    },
+    {
       "id": 13,
       "slug": "my-12-axes",
       "name": "My 12 Axes",
@@ -47,7 +203,7 @@
       "name": "Nevect",
       "tagline": "Self-hosted affiliate tracking with S2S postbacks",
       "description": "<p>Bootstrapped self-hosted affiliate tracker for teams that outgrew rented SaaS trackers. S2S postbacks, campaigns, offers — you own the server and the data. One-time license $199 / 365 days.</p>",
-      "websiteUrl": "https://nevect.com/?utm_source=betterlaunch&utm_medium=directory&utm_campaign=backlinks_202610",
+      "websiteUrl": "https://nevect.com",
       "logoUrl": "/media/logos/y04eJQvCWz1RTz5ujIQwRarf4Wf1Pf8B/ff972541-9fb2-4b13-a6eb-d82205ecadc7.png",
       "thumbnailUrl": "/media/thumbnails/y04eJQvCWz1RTz5ujIQwRarf4Wf1Pf8B/6ff1c849-ed44-4807-8af6-6435058519a1.png",
       "publishedAt": "2026-11-09T00:00:18.984Z",
@@ -55,5 +211,14 @@
       "weekNumber": 46
     }
   ],
-  "sponsors": []
+  "sponsors": [
+    {
+      "name": "AI Free video",
+      "tagline": "Free AI Video Generator: Turn Text or Photos Into Video",
+      "websiteUrl": "https://aifree.video",
+      "imageUrl": "/media/sponsors/checkouts/f579d26e-b31a-4d95-871b-bc7ace4c1ed5.webp",
+      "startsAt": "2026-11-15",
+      "endsAt": "2026-11-15"
+    }
+  ]
 }
