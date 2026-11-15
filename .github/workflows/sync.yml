@@ -2,8 +2,8 @@ name: Sync BetterLaunch dataset
 
 on:
   schedule:
-    # Sunday 12:00 Asia/Shanghai (UTC+8).
-    - cron: '0 4 * * 0'
+    # Monday 10:00 Asia/Shanghai (UTC+8).
+    - cron: '0 2 * * 1'
   workflow_dispatch:
 
 permissions:
