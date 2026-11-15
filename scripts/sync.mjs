@@ -20,7 +20,7 @@ const media = (v) => v === null || url(v) || (nonempty(v) && v.startsWith('/') &
 const schemas = {
   products: {
     id: integer, slug: (v) => nonempty(v) && /^[\p{L}\p{N}\p{M}]+(?:-[\p{L}\p{N}\p{M}]+)*$/u.test(v),
-    name: nonempty, tier: (v) => ['free', 'boost', 'highlight'].includes(v), tagline: nullableText, description: nullableText,
+    name: nonempty, tier: (v) => ['free', 'boost', 'highlight'].includes(v), voteCount: (v) => Number.isSafeInteger(v) && v >= 0, tagline: nullableText, description: nullableText,
     websiteUrl: url, logoUrl: media, thumbnailUrl: media, publishedAt: date,
     year: (v) => integer(v) && v >= 1970 && v <= 9999,
     weekNumber: (v) => integer(v) && v <= 53,
@@ -85,7 +85,7 @@ export function normalizeDataset(input) {
   const data = validateDataset(input);
   return {
     schemaVersion: 1, source: SOURCE,
-    products: [...data.products].sort((a, b) => b.year - a.year || b.weekNumber - a.weekNumber || Date.parse(b.publishedAt) - Date.parse(a.publishedAt) || b.id - a.id),
+    products: [...data.products].sort((a, b) => b.year - a.year || b.weekNumber - a.weekNumber || b.voteCount - a.voteCount || Date.parse(b.publishedAt) - Date.parse(a.publishedAt) || b.id - a.id),
     sponsors: [...data.sponsors].sort((a, b) => b.startsAt.localeCompare(a.startsAt) || a.websiteUrl.localeCompare(b.websiteUrl) || a.name.localeCompare(b.name) || a.endsAt.localeCompare(b.endsAt) || a.tagline.localeCompare(b.tagline) || String(a.imageUrl).localeCompare(String(b.imageUrl))),
   };
 }

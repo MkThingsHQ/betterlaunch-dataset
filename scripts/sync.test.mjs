@@ -44,7 +44,7 @@ test('weekly sync replaces previous products and clears a valid empty week', asy
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-const product = (id, year = 2026, weekNumber = 42) => ({ id, slug: `product-${id}`, name: `Product ${id}`, tier: 'free', tagline: 'Useful tool', description: '<p>Full description</p>', websiteUrl: 'https://example.com', logoUrl: null, thumbnailUrl: '/media/image.webp', publishedAt: '2026-10-13T00:00:00.000Z', year, weekNumber });
+const product = (id, year = 2026, weekNumber = 42) => ({ id, slug: `product-${id}`, name: `Product ${id}`, tier: 'free', voteCount: 0, tagline: 'Useful tool', description: '<p>Full description</p>', websiteUrl: 'https://example.com', logoUrl: null, thumbnailUrl: '/media/image.webp', publishedAt: '2026-10-13T00:00:00.000Z', year, weekNumber });
 const sponsor = (websiteUrl = 'https://example.com', startsAt = '2026-10-01') => ({ name: 'Sponsor', tagline: 'Sponsor description', websiteUrl, imageUrl: null, startsAt, endsAt: '2026-10-31' });
 const fixture = () => ({ schemaVersion: 1, source: SOURCE, products: [product(1), product(2), product(3)], sponsors: [] });
 const template = '# Products\n{{STATS}}\n{{SPONSORS}}\n{{PRODUCTS}}\n';
@@ -61,6 +61,23 @@ test('orders permanent Batch weeks newest first, including year boundaries', () 
   assert.match(rendered, /\[2026 · Week 42\]\(#2026-w42\)/);
   assert.match(rendered, /https:\/\/betterlaunch.app\/p\/product-1/);
 });
+test('sorts each week by votes descending before creation time and ID', () => {
+  const data = fixture();
+  data.products[0].voteCount = 20;
+  data.products[0].publishedAt = '2026-01-01T00:00:00Z';
+  data.products[1].voteCount = 5;
+  data.products[2].voteCount = 5;
+  const older = { ...product(4), voteCount: 5, publishedAt: '2026-10-12T00:00:00Z' };
+  data.products.push(older, product(5));
+  const before = JSON.stringify(data);
+  const sorted = normalizeDataset(data);
+  assert.deepEqual(sorted.products.map(p => p.id), [1, 3, 2, 4, 5]);
+  assert.equal(JSON.stringify(data), before);
+  const rendered = renderReadme(data, template, week);
+  const ids = [...rendered.matchAll(/https:\/\/betterlaunch\.app\/p\/product-(\d+)/g)].map(match => Number(match[1]));
+  assert.deepEqual(ids, [1, 3, 2, 4, 5]);
+});
+
 test('sponsors precede weeks, deduplicated across tracking and www variants', () => {
   const data = fixture();
   data.sponsors = [sponsor('https://www.example.com/?utm_source=x'), sponsor('https://example.com/path', '2026-09-01'), sponsor('https://another.com')];
@@ -92,6 +109,10 @@ test('rejects unknown public fields, private fields, duplicate IDs, invalid week
     (d) => { d.products[0].stripePaymentId = 'private'; },
     (d) => { d.products[0].tier = 'sponsor'; },
     (d) => { delete d.products[0].tier; },
+    (d) => { delete d.products[0].voteCount; },
+    (d) => { d.products[0].voteCount = -1; },
+    (d) => { d.products[0].voteCount = 1.5; },
+    (d) => { d.products[0].voteCount = '10'; },
     (d) => { d.products.push(d.products[0]); },
     (d) => { d.products[0].websiteUrl = 'javascript:alert(1)'; },
     (d) => { d.products[0].websiteUrl = 'https://secret@example.com'; },
